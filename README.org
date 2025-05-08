@@ -1,0 +1,32 @@
+#+TITLE:README
+#+AUTHOR: L. Gualdi
+
+* Introduction
+
+A complete rewrite of my personal emacs configuration, using literate
+programming and org-mode. This file is inspired by config files of [[https://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua]],
+[[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][Mathieu Marques]], [[https://jamiecollinson.com/blog/my-emacs-config/][Jamie Collinson]], [[https://github.com/protesilaos][Protesilaos Stavrou]], [[https://howardabrams.com/hamacs][Howard Abrams]], [[https://github.com/rougier/dotemacs/blob/master/dotemacs.org][Nicolas
+Rougier]] and [[https://github.com/jamescherti/minimal-emacs.d][minimal-emacs.d]].
+
+I'm running emacs on macosx and on windows. I tried to make this
+configuration compatible with both environment.
+
+* How to use
+
+Open =dotemacs.org= with emacs and tangle code using 'C-c C-v t' to initialize
+=~/.emacs.d/early-init.el= and =~/.emacs.d/init.el=. If these files already
+exists, they will be overwritten.
+
+* Personal settings
+
+Personal settings can be load from =.work/settings.el= or =.home/settings.el= if
+it exist in user emacs directory.
+
+* Notes
+
+On windows, emacs is looking for =init.el= in user's home directory in
+=AppData\Roaming= folder. To bypass this behaviour, set =HOME= environment
+variable to a different path.
+
+
+
