@@ -3,7 +3,6 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/init.el"  :exports code
 
 * early-init.el
-
 #+begin_src elisp :tangle "~/.emacs.d/early-init.el"  :exports code
   ;;; early-init.el --- Initialization file for Emacs -*- lexical-binding: t; -*-
   ;;; Commentary:
@@ -47,9 +46,7 @@
 
 
 * init.el
-
 ** Header
-
 #+begin_src elisp
   ;;; init.el --- Initialization file for Emacs -*- lexical-binding: t; -*-
   ;;; Commentary:
@@ -91,7 +88,6 @@ Load my personnal lisp module stored in "elisp" directory
 #+end_src
 
 ** Default settings
-
 #+begin_src elisp
   ;; Disable all backup files
   (setopt make-backup-files nil)
@@ -103,7 +99,7 @@ Load my personnal lisp module stored in "elisp" directory
   (set-language-environment 'utf-8)
   (set-default-coding-systems 'utf-8)
 
-  ;; Delete the current selection 
+  ;; Delete the current selection
   (delete-selection-mode t)
 
   ;; Disable scroll bar, menu bar, etc.
@@ -151,11 +147,17 @@ Load my personnal lisp module stored in "elisp" directory
   (run-with-idle-timer 1 nil (lambda () (require 'org)))
 #+end_src
 
+When the help window appears on another frame, then give that frame input focus
+too.
+#+begin_src emacs-lisp
+  (setopt help-window-select t)
+#+end_src
+
+
 ** Macosx related settings
-
 *** Keyboard
-
-I'm using a mac with a french keyboard layout. Some characters cannot be used directly.
+I'm using a mac with a french keyboard layout. Some characters cannot be used
+directly.
 
 #+begin_src elisp
   (defvar mac-command-modifier)
@@ -164,16 +166,20 @@ I'm using a mac with a french keyboard layout. Some characters cannot be used di
   (defvar ns-function-modifier)
 
   (if (memq window-system '(mac ns))
-    (progn
-      (setq mac-command-modifier 'meta)  ;; enable meta as command
-      (setq mac-option-modifier 'none) ;; Disable option key to be able to input special characters like pipe or tilde on french keyboard
-      (setq mac-control-modifier 'control) ;; Enable control 
-      (setq ns-function-modifier 'super)  ;; make Fn key do Super
-      (setq default-input-method "MacOSX")))
+      (progn
+        ;; Remap <home> and <end> to beginning-of-line and end-of-line
+        ;; instead of  beginning-of-buffer and end-of-buffer
+        (keymap-global-set "<home>" 'beginning-of-line)
+        (keymap-global-set "<end>" 'end-of-line)
+
+        (setq mac-command-modifier 'meta)  ;; enable meta as command
+        (setq mac-option-modifier 'none) ;; Disable option key to be able to input special characters like pipe or tilde on french keyboard
+        (setq mac-control-modifier 'control) ;; Enable control
+        (setq ns-function-modifier 'super)  ;; make Fn key do Super
+        (setq default-input-method "MacOSX")))
 #+end_src
 
 *** Frame titlebar follow macosx theme
-
 #+begin_src elisp
   (if (memq window-system '(mac ns))
       (progn
@@ -185,13 +191,11 @@ I'm using a mac with a french keyboard layout. Some characters cannot be used di
 
 ** Emacs Appearance
 *** Themes
-
 #+begin_src elisp
   (load-theme 'tango-plus t)
 #+end_src
 
 *** Fonts
-
 Use the Iosevka font for code and prose.
 Use function from [[https://jeffkreeftmeijer.com/emacs-configuration/][Jeff Kreeftmeijer]] init.el
 #+begin_src elisp
@@ -204,14 +208,13 @@ Use function from [[https://jeffkreeftmeijer.com/emacs-configuration/][Jeff Kree
   (jk/set-face-font 'fixed-pitch "Iosevka")
   (jk/set-face-font 'variable-pitch "Iosevka Aile")
 
- 
+
   ;; Use a hook to use variable pitch font in text-mode
-  (add-hook 'text-mode-hook #'variable-pitch-mode) 
+  (add-hook 'text-mode-hook #'variable-pitch-mode)
 #+end_src
 
 
 ** Packages settings
-
 Package repository declaration and package initialization is done in =early-init.el=.
 
 *** exec-path-from-shell
@@ -223,9 +226,54 @@ Load emacs exec-path with what is defined in shell path.
     :config
     (exec-path-from-shell-initialize))
 #+end_src
+*** Spellchecking
+On macosx, it's possible to install aspell via brew.
+
+#+begin_src sh :tangle no
+  $ brew install aspell
+#+end_src
+
+To switch between dictionary, you just have to use ~M-x ispell-change-dictionary~.
+
+**** Flyspell
+Enable flyspell in text-mode derived buffer.
+
+#+begin_src elisp
+  (use-package flyspell
+    :bind (:map flyspell-mouse-map
+                ("<down-mouse-3>" . flyspell-correct-word)
+                ("<mouse-3>" . undefined))
+    :hook (text-mode . flyspell-mode))
+#+end_src
+
+**** Flycheck-grammalect
+Enable flycheck-grammalect for french grammar and typography check.
+The current version in melpa needs pkg-info.
+
+#+begin_src elisp
+  (use-package pkg-info
+    :ensure t)
+#+end_src
+
+To use this package, you need to download the [[https://grammalecte.net/#download][Grammalect CLI & Server upstream]]
+package. Just enter the following command: ~M-x grammalecte-download-grammalecte~.
+Grammalect command line and server needs =Python 3.5+= our =Python 3.7+= to run.
+
+#+begin_src elisp
+  (use-package flycheck-grammalecte
+    :ensure t
+    :hook (text-mode . flycheck-mode)
+    :init
+    (setq flycheck-grammalecte-report-apos nil
+          flycheck-grammalecte-report-typo nil
+          flycheck-grammalecte-report-esp nil
+          flycheck-grammalecte-report-nbsp nil)
+    :config
+    ;; (grammalecte-download-grammalecte)   ;
+    (flycheck-grammalecte-setup))
+#+end_src
 
 *** Plantuml
-
 #+begin_src elisp :tangle no
   (use-package plantuml-mode
     :ensure nil
@@ -243,7 +291,7 @@ Load emacs exec-path with what is defined in shell path.
 *** SSH
 #+begin_src emacs-lisp
   (use-package ssh-agency
-    :ensure t) 
+    :ensure t)
 
   (setenv "SSH_ASKPASS" "git-gui--askpass")
 #+end_src
@@ -278,7 +326,7 @@ Load emacs exec-path with what is defined in shell path.
     :ensure t
     ;; Optional customizations
     :custom
-    (corfu-auto t) ;; Enable corfu autocompletion 
+    (corfu-auto t) ;; Enable corfu autocompletion
     ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
     ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
     ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -333,7 +381,6 @@ Load emacs exec-path with what is defined in shell path.
 #+end_src
 
 *** Org-mode
-
 #+begin_src elisp
   (use-package org
     :ensure nil
@@ -354,7 +401,7 @@ Load emacs exec-path with what is defined in shell path.
                    "* TODO %?%^{CATEGORY}p\n%U\n" :empty-lines 1 :jump-to-captured t)
                   ("a" "Appeler un client" entry (file+headline "Todo.org" "Tâches")
                    "* Appeler %^{Nom client}\nSCHEDULED:%^t\n%?" :empty-lines 1 :jump-to-captured t))))
-    
+
     (setq org-M-RET-may-split-line '((default . nil))) ; Doing M-RET when cursor is in middle of heading will not split line at current POS
 
     (setq org-todo-keywords
@@ -368,17 +415,17 @@ Load emacs exec-path with what is defined in shell path.
        ;; (restclient . t)
        ;;(plantuml . t)
        ))
-    
+
 
     :custom
     ;; Setup custom variable for org-mode
     (org-insert-heading-respect-content t)
 
-    (org-directory "~/Documents/Org")    
+    (org-directory "~/Documents/Org")
     (org-archive-location "./Archives/%s_archive::")
     (org-agenda-files
      '("~/Documents/Org/Todo.org"))
-    
+
     (org-log-done t)                      ; Log when a task is done
     (org-startup-indented t)              ; Indent text according to outline structure
     (org-startup-with-inline-images t)    ; Display inline image by default
@@ -386,7 +433,7 @@ Load emacs exec-path with what is defined in shell path.
     (org-image-actual-width '(600)))      ; Image default size
 #+end_src
 
-**** Org-duration 
+**** Org-duration
 Change default duration for clock :
 - 1h = 60 min
 - Work average 8h/day
@@ -409,7 +456,7 @@ Change default duration for clock :
 #+end_src
 
 *** Org-roam
-I do not used org-roam yet. 
+I do not used org-roam yet.
 #+begin_src elisp :tangle no
   (use-package org-roam
     :after (org)
@@ -426,8 +473,6 @@ I do not used org-roam yet.
 #+end_src
 
 *** Org-superagenda
-
-
 #+begin_src elisp
   (use-package org-super-agenda
     :after (org)
@@ -441,8 +486,6 @@ I do not used org-roam yet.
                                     (:name "En Attente" :todo "WAITING" :order 4 )
                                     (:name "Un jour peut-être" :todo "MAYBE" :order 500 ))))
 #+end_src
-
-
 
 ** EOF
 #+begin_src elisp
