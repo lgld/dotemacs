@@ -79,7 +79,7 @@ Load personal's settings such as name or current email from another file
       (load file-path)))
 #+end_src
 
-Load my personnal lisp module stored in "elisp" directory
+Load my personal lisp module stored in "elisp" directory
 
 #+begin_src elisp
   (add-to-list 'load-path
@@ -179,7 +179,7 @@ directly.
         (setq default-input-method "MacOSX")))
 #+end_src
 
-*** Frame titlebar follow macosx theme
+*** Frame title bar follow Macosx theme
 #+begin_src elisp
   (if (memq window-system '(mac ns))
       (progn
@@ -226,28 +226,96 @@ Load emacs exec-path with what is defined in shell path.
     :config
     (exec-path-from-shell-initialize))
 #+end_src
+
 *** Spellchecking
-On macosx, it's possible to install aspell via brew.
+I spent a lot of time trying to setup spellchecking within Emacs. I don't know
+if this is the right way to do it, but with trials and errors, i was able to find a
+workable enough setup for my needs.
+
+On Macosx, I'm using Aspell because it was the easiest one to setup.
+Aspell can be install via [[https://brew.sh/][homebrew]].
 
 #+begin_src sh :tangle no
   $ brew install aspell
 #+end_src
 
-To switch between dictionary, you just have to use ~M-x ispell-change-dictionary~.
+On windows, I'm using Hunspell. Hunspell can be install with [[https://chocolatey.org/][chocolatey]] package manager.
+
+#+begin_src sh :tangle no
+  choco install hunspell
+#+end_src
+
+In order to make Hunspell work on windows, create a directory =C:/hunspell=.
+Then copy all *.aff and *.dic files that you need in this directory. I copied
+mine from the [[https://github.com/LibreOffice/dictionaries][LibreOffice dictionaries]] repo on GitHub.
+
+Then you must initialize =ispell-hunspell-dict-paths-alist= with all the
+dictionary that you want to use.
+
+At runtime, Emacs setup automatically the variable ~ispell-program-name~ to correct path
+depending of your current spellchecker.
+
+To switch between dictionary, you just have to use ~M-x
+ispell-change-dictionary~ and select one of the dictionary initialized in =ispell-hunspell-dict-paths-alist=.
+
+I also setup a personal dictionary using =ispell-personal-dictionary=. it must
+be an absolute file name and the file must already exist for Hunspell to be able
+to use it.
+
+#+begin_src elisp
+  (use-package ispell
+    :config
+    ;; Set the default language environment variable to french
+    (setenv "LANG" "fr")
+
+    ;; Setup all dictionary path to use only on windows
+    (when (memq window-system '(w32))
+      (setopt
+       ispell-hunspell-dict-paths-alist
+       '(("fr" "C:/Hunspell/fr.aff")
+         ("en_GB" "C:/Hunspell/en_GB.aff")
+         ("en_US" "C:/Hunspell/en_US.aff")
+         )))
+
+    ;; Create a personal dictionary if it doesn't exist.
+    (let ((filename (expand-file-name "perso.dic" user-emacs-directory)))
+      (unless (file-exists-p filename)
+        (with-temp-buffer
+          (write-file filename))))
+
+    :custom
+    ;; There is a bug in corfu  [[https://github.com/minad/corfu/discussions/457][#457]]
+    ;; Error running timer ‘corfu--auto-complete-deferred’: (error "ispell-lookup-words: No plain word-list found at systemdefault locations.  Customize ‘ispell-alternate-dictionary’ to set yours.")
+    ;; a workaround is to set this variable to nil
+    (text-mode-ispell-word-completion nil)
+
+    ;; Setup the personal dictionary path
+    (ispell-personal-dictionary
+     (expand-file-name "perso.dic" user-emacs-directory))
+
+    ;; Ignore file sections for spell checking.
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+    (add-to-list 'ispell-skip-region-alist '("\\$" . "\\$"))
+    (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:")))
+#+end_src
 
 **** Flyspell
-Enable flyspell in text-mode derived buffer.
+Enable Flyspell in text-mode derived buffer.
 
 #+begin_src elisp
   (use-package flyspell
-    :bind (:map flyspell-mouse-map
-                ("<down-mouse-3>" . flyspell-correct-word)
-                ("<mouse-3>" . undefined))
-    :hook (text-mode . flyspell-mode))
+    :bind
+    (:map flyspell-mouse-map
+          ("<down-mouse-3>" . flyspell-correct-word)
+          ("<mouse-3>" . undefined))
+    :hook
+    (text-mode . flyspell-mode))
 #+end_src
 
 **** Flycheck-grammalect
-Enable flycheck-grammalect for french grammar and typography check.
+This enable =flycheck-grammalect= for french grammar and typography check.
 The current version in melpa needs pkg-info.
 
 #+begin_src elisp
