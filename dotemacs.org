@@ -218,7 +218,10 @@ Use function from [[https://jeffkreeftmeijer.com/emacs-configuration/][Jeff Kree
 Package repository declaration and package initialization is done in =early-init.el=.
 
 *** exec-path-from-shell
-Load emacs exec-path with what is defined in shell path.
+On Macosx, when Emacs instance is launched as a GUI app, it inherits a default
+minimal set of environment variable. This package ensure environment variable
+inside Emacs look the same as in the user's path.
+
 #+begin_src elisp
   (use-package exec-path-from-shell
     :if (memq window-system '(mac ns))
@@ -330,12 +333,16 @@ Grammalect command line and server needs =Python 3.5+= our =Python 3.7+= to run.
 #+begin_src elisp
   (use-package flycheck-grammalecte
     :ensure t
-    :hook (text-mode . flycheck-mode)
+
+    :hook
+    (text-mode . flycheck-mode)
+
     :init
     (setq flycheck-grammalecte-report-apos nil
           flycheck-grammalecte-report-typo nil
           flycheck-grammalecte-report-esp nil
           flycheck-grammalecte-report-nbsp nil)
+
     :config
     ;; (grammalecte-download-grammalecte)   ;
     (flycheck-grammalecte-setup))
@@ -560,5 +567,3 @@ I do not used org-roam yet.
   (provide 'init)
   ;;; init.el ends here
 #+end_src
-
-
