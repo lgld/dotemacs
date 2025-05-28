@@ -267,6 +267,7 @@ to use it.
 
 #+begin_src elisp
   (use-package ispell
+    :defer t
     :config
     ;; Set the default language environment variable to french
     (setenv "LANG" "fr")
@@ -286,6 +287,13 @@ to use it.
         (with-temp-buffer
           (write-file filename))))
 
+    ;; Ignore file sections for spell checking.
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+    (add-to-list 'ispell-skip-region-alist '("\\$" . "\\$"))
+    (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+
     :custom
     ;; There is a bug in corfu  [[https://github.com/minad/corfu/discussions/457][#457]]
     ;; Error running timer ‘corfu--auto-complete-deferred’: (error "ispell-lookup-words: No plain word-list found at systemdefault locations.  Customize ‘ispell-alternate-dictionary’ to set yours.")
@@ -294,14 +302,7 @@ to use it.
 
     ;; Setup the personal dictionary path
     (ispell-personal-dictionary
-     (expand-file-name "perso.dic" user-emacs-directory))
-
-    ;; Ignore file sections for spell checking.
-    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
-    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
-    (add-to-list 'ispell-skip-region-alist '("\\$" . "\\$"))
-    (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
-    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:")))
+     (expand-file-name "perso.dic" user-emacs-directory)))
 #+end_src
 
 **** Flyspell
@@ -309,6 +310,7 @@ Enable Flyspell in text-mode derived buffer.
 
 #+begin_src elisp
   (use-package flyspell
+    :defer t
     :bind
     (:map flyspell-mouse-map
           ("<down-mouse-3>" . flyspell-correct-word)
