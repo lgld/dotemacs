@@ -57,7 +57,7 @@
 #+end_src
 
 ** Customized settings
-It's possible to configure emacs settings via =M-x customize=. By default, the
+It's possible to configure Emacs settings via =M-x customize=. By default, the
 customized settings are stored in the 'user-init-file'. Store customized
 settings in =custom.el= instead of =init.el=.
 #+begin_src elisp
@@ -105,7 +105,10 @@ Load my personal lisp module stored in "elisp" directory
   ;; Disable scroll bar, menu bar, etc.
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  (menu-bar-mode -1)
+
+  ;; Hide menu bar except on macosx
+  (unless (memq window-system '(mac ns))
+    (menu-bar-mode -1))
 
   ;; Inihibit startup screen
   (setopt inhibit-startup-screen t)
