@@ -619,6 +619,18 @@ I do not used org-roam yet.
                                     (:name "Un jour peut-être" :todo "MAYBE" :order 500 ))))
 #+end_src
 
+*** Terminal and shell
+Use =eat= terminal emulator.
+#+begin_src elisp
+  (use-package eat
+    :ensure t
+    :hook
+    (eshell-load . eat-eshell-mode)
+    ;; (eshell-load . eat-eshell-visual-command-mode)
+    )
+#+end_src
+
+
 ** EOF
 #+begin_src elisp
   (provide 'init)
