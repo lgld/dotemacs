@@ -153,6 +153,36 @@ too.
   (setopt help-window-select t)
 #+end_src
 
+Add a hook to delete all trailing white space before saving.
+
+Note : ~#'~ syntax is a short-hand for using 'function'. 'function' is like 'quote' but
+preferred for objects which are functions (see Emacs lisp manual).
+
+#+begin_src elisp
+  (add-hook 'before-save-hook #'delete-trailing-whitespace)
+#+end_src
+
+Enable mode to save list of recently opened files.
+#+begin_src elisp
+  (recentf-mode t)
+#+end_src
+
+Save cursor position between Emacs sessions.
+#+begin_src elisp
+  (save-place-mode t)
+#+end_src
+
+Save history
+#+begin_src elisp
+  ;; Persist history over Emacs restarts.
+  (use-package savehist
+    :custom
+    (history-delete-duplicates t)
+
+    :init
+    (savehist-mode))
+#+end_src
+
 
 ** Macosx related settings
 *** Keyboard
