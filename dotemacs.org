@@ -302,9 +302,6 @@ to use it.
   (use-package ispell
     :defer t
     :config
-    ;; Set the default language environment variable to french
-    (setenv "LANG" "fr")
-
     ;; Setup all dictionary path to use only on windows
     (when (memq window-system '(w32))
       (setopt
@@ -332,6 +329,10 @@ to use it.
     ;; Error running timer ‘corfu--auto-complete-deferred’: (error "ispell-lookup-words: No plain word-list found at systemdefault locations.  Customize ‘ispell-alternate-dictionary’ to set yours.")
     ;; a workaround is to set this variable to nil
     (text-mode-ispell-word-completion nil)
+
+    ;; Set the default dictionary to french
+    (ispell-dictionary "fr")
+    (ispell-current-dictionary "fr")
 
     ;; Setup the personal dictionary path
     (ispell-personal-dictionary
