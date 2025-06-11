@@ -302,6 +302,12 @@ to use it.
   (use-package ispell
     :defer t
     :config
+
+    ;; Set the default dictionary to french
+    (setenv "DICTIONARY" "fr")
+    (setopt ispell-dictionary "fr")
+    (setopt ispell-current-dictionary "fr")
+
     ;; Setup all dictionary path to use only on windows
     (when (memq window-system '(w32))
       (setopt
@@ -329,10 +335,6 @@ to use it.
     ;; Error running timer ‘corfu--auto-complete-deferred’: (error "ispell-lookup-words: No plain word-list found at systemdefault locations.  Customize ‘ispell-alternate-dictionary’ to set yours.")
     ;; a workaround is to set this variable to nil
     (text-mode-ispell-word-completion nil)
-
-    ;; Set the default dictionary to french
-    (ispell-dictionary "fr")
-    (ispell-current-dictionary "fr")
 
     ;; Setup the personal dictionary path
     (ispell-personal-dictionary
@@ -624,9 +626,10 @@ I do not used org-roam yet.
 #+end_src
 
 *** Terminal and shell
-Use =eat= terminal emulator.
+Use =eat= terminal emulator when running macosx.
 #+begin_src elisp
   (use-package eat
+    :if (memq window-system '(mac ns))
     :ensure t
     :hook
     (eshell-load . eat-eshell-mode)
