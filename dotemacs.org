@@ -371,6 +371,7 @@ Grammalect command line and server needs =Python 3.5+= our =Python 3.7+= to run.
 #+begin_src elisp
   (use-package flycheck-grammalecte
     :ensure t
+    :demand t ; force package to load immediately
 
     :hook
     (text-mode . flycheck-mode)
