@@ -1,5 +1,7 @@
+# -*- ispell-local-dictionary: "en_US" -*-
 #+TITLE:My Emacs Literate Config
 #+AUTHOR: L. Gualdi
+#+LANGUAGE: en
 #+PROPERTY: header-args :tangle "~/.emacs.d/init.el"  :exports code
 
 * early-init.el
@@ -297,6 +299,15 @@ ispell-change-dictionary~ and select one of the dictionary initialized in =ispel
 I also setup a personal dictionary using =ispell-personal-dictionary=. it must
 be an absolute file name and the file must already exist for Hunspell to be able
 to use it.
+
+It's also possible to setup ispell dictionary on a per file basis if you specify
+=ispell-local-dictionary= value in the first line of the file (see [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html][Specifying File Variable]]).
+
+#+begin_example
+-*- ispell-local-dictionary: "en_US" -*-
+#+end_example
+
+
 
 #+begin_src elisp
   (use-package ispell
