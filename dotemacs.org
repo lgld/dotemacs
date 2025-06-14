@@ -382,6 +382,18 @@ Grammalect command line and server needs =Python 3.5+= our =Python 3.7+= to run.
           flycheck-grammalecte-report-esp nil
           flycheck-grammalecte-report-nbsp nil)
 
+    ;; enable grammalect only in french org-mode buffers
+    (setq flycheck-grammalecte-predicate
+          (lambda ()
+            (or (and (derived-mode-p 'org-mode)
+                     (equal "fr"
+                            (or (cadar (org-collect-keywords '("LANGUAGE")))
+                                (bound-and-true-p
+                                  org-export-default-language))))
+                (and (boundp 'ispell-local-dictionary)
+                     (member ispell-local-dictionary
+                             '("fr" "francais7" "francais-tex"))))))
+
     :config
     ;; (grammalecte-download-grammalecte)   ;
     (flycheck-grammalecte-setup))
