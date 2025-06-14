@@ -248,7 +248,6 @@ Use function from [[https://jeffkreeftmeijer.com/emacs-configuration/][Jeff Kree
   (add-hook 'text-mode-hook #'variable-pitch-mode)
 #+end_src
 
-
 ** Packages settings
 Package repository declaration and package initialization is done in =early-init.el=.
 
@@ -542,6 +541,17 @@ Completion at point extensions to be used in combination with =corfu=.
     (dired-dwim-target t))
 #+end_src
 
+*** Powershell
+Install package to edit powershell script with Emacs and execute powershell command from
+org-mode source block.
+#+begin_src elisp
+  (use-package powershell
+    :ensure t)
+
+  (use-package ob-powershell
+    :ensure t)
+#+end_src
+
 *** Org-mode
 #+begin_src elisp
   (use-package org
@@ -574,6 +584,7 @@ Completion at point extensions to be used in combination with =corfu=.
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((emacs-lisp . t)
+       (powershell . t)
        ;; (restclient . t)
        ;;(plantuml . t)
        ))
@@ -660,7 +671,6 @@ Use =eat= terminal emulator when running macosx.
     ;; (eshell-load . eat-eshell-visual-command-mode)
     )
 #+end_src
-
 
 ** EOF
 #+begin_src elisp
