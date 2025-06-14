@@ -1,5 +1,7 @@
+# -*- ispell-local-dictionary: "en_US" -*-
 #+TITLE:README
 #+AUTHOR: L. Gualdi
+#+LANGUAGE: en
 
 * Introduction
 
@@ -28,5 +30,12 @@ On windows, Emacs is looking for =init.el= in user's home directory in
 =AppData\Roaming= folder. To bypass this behavior, set =HOME= environment
 variable to a different path.
 
+* Tasks list [0/5]
 
-
+- [ ] Outlook integration
+  - [ ] Create outlook appointment from org-agenda item
+  - [ ] Create outlook email with org-mode document
+- [ ] Add org-mode template for project management
+- [ ] Add template for org-mode html export
+- [ ] Add template for org-mode pdf export
+- [ ] Add template for org-mode docx export (is it possible ?)
