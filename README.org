@@ -30,11 +30,14 @@ On windows, Emacs is looking for =init.el= in user's home directory in
 =AppData\Roaming= folder. To bypass this behavior, set =HOME= environment
 variable to a different path.
 
-* Tasks list [0/5]
+* Tasks list [0/6]
 
-- [ ] Outlook integration
+- [ ] Windows integration
   - [ ] Create outlook appointment from org-agenda item
   - [ ] Create outlook email with org-mode document
+  - [ ] Create org-agenda item from outlook appointment (org-protocol ?)
+- [ ] Macosx integration
+  - [ ] Create event in calendar app from org-agenda item
 - [ ] Add org-mode template for project management
 - [ ] Add template for org-mode html export
 - [ ] Add template for org-mode pdf export
