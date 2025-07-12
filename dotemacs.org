@@ -124,6 +124,12 @@ Load my personal lisp module stored in "elisp" directory
   ;; Use space instead of tab
   (setq-default indent-tabs-mode nil)
 
+  ;; Change default tab width
+  (setq-default tab-width 2)
+  (setq-default js-indent-level 2)
+  (setq-default css-indent-offset 2)
+
+
   ;; By default, Emacs "updates" its ui more often than it needs to
   (setq idle-update-delay 1.0)
 
