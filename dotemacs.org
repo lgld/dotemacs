@@ -583,7 +583,7 @@ org-mode source block.
     (setq org-M-RET-may-split-line '((default . nil))) ; Doing M-RET when cursor is in middle of heading will not split line at current POS
 
     (setq org-todo-keywords
-          '((sequence "TODO(t)" "WAITING(w)" "MAYBE(m)"  "|" "DONE(d)" "CANCEL(c)")))
+          '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAITING(w)" "MAYBE(m)"  "|" "DONE(d)" "CANCEL(c)")))
 
 
     ;; Initialisation de org-babel
@@ -591,6 +591,7 @@ org-mode source block.
      'org-babel-load-languages
      '((emacs-lisp . t)
        (powershell . t)
+       (org . t)
        ;; (restclient . t)
        ;;(plantuml . t)
        ))
