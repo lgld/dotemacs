@@ -15,9 +15,13 @@ configuration compatible with both environment.
 
 * How to use
 
-Open =dotemacs.org= with Emacs and tangle code using 'C-c C-v t' to initialize
+Open [[file:dotemacs.org][dotemacs.org]] with Emacs and tangle code using 'C-c C-v t' to initialize
 =~/.emacs.d/early-init.el= and =~/.emacs.d/init.el=. If these files already
 exists, they will be overwritten.
+
+Open [[file:my-org-outlook.org][my-org-outlook.org]] with Emacs and tangle code to initialize utilities to interface Org-mode
+with Outlook using ~org-element~ and PowerShell scripts.
+
 
 * Personal settings
 
@@ -30,14 +34,14 @@ On windows, Emacs is looking for =init.el= in user's home directory in
 =AppData\Roaming= folder. To bypass this behavior, set =HOME= environment
 variable to a different path.
 
-* Tasks list [0/6]
+* Tasks list
 
-- [ ] Windows integration
-  - [ ] Create outlook appointment from org-agenda item
-  - [ ] Create outlook email with org-mode document
-  - [ ] Create org-agenda item from outlook appointment (org-protocol ?)
+- [1/3] Windows integration
+  - [X] Create outlook appointment from org-mode SCHEDULED item
+  - [ ] Create outlook email from org-mode document
+  - [ ] Create an org-mode SCHEDULED item from outlook appointment (org-protocol ?)
 - [ ] Macosx integration
-  - [ ] Create event in calendar app from org-agenda item
+  - [ ] Create event in calendar app from org-mode SCHEDULED item
 - [ ] Add org-mode template for project management
 - [ ] Add template for org-mode html export
 - [ ] Add template for org-mode pdf export
