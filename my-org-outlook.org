@@ -1,0 +1,249 @@
+# -*- ispell-local-dictionary: "en_US" -*-
+#+TITLE: Integrate org-mode with outlook using Emacs elisp and powershell
+#+LANGUAGE:  en
+#+PROPERTY: header-args :tangle no :exports code :mkdirp yes
+
+Small utilities to interface Org-mode with Outlook using ~org-element~ and PowerShell scripts.
+
+To initialize the scripts:
+
+1. Open this file in Emacs.
+2. Run the following command to tangle the code:
+
+   #+BEGIN_SRC elisp
+   C-c C-v t
+   #+END_SRC
+
+This will generate:
+
+- PowerShell scripts in the =~/.emacs.d/scripts= directory
+- Emacs Lisp files in the =~/.emacs.d/elisp= directory
+
+If these files already exist, they will be overwritten.
+
+
+* Calendar integration
+
+This powershell script create an appointment in calendar using outlook com object.
+
+#+begin_src powershell :tangle "~/.emacs.d/scripts/CreateAppointment.ps1"
+  param (
+      [Parameter(Mandatory)]
+      [string]$Subject,
+
+      [Parameter(Mandatory)]
+      [datetime]$Start,
+
+      [Parameter(Mandatory)]
+      [datetime]$End,
+
+      [string]$Location = "",
+      [string]$Body = "",
+      [bool]$ReminderSet = $true,
+      [int]$ReminderMinutesBeforeStart = 15,
+      [bool]$BusyStatusBusy = $true,
+      [string]$AllDayEvent = "$false"
+  )
+
+  try {
+      # Create Outlook COM object
+      $Outlook = New-Object -ComObject Outlook.Application
+      $Appointment = $Outlook.CreateItem(1)  # 1 = olAppointmentItem
+
+      # Set properties
+      $Appointment.Subject = $Subject
+      $Appointment.Start = $Start
+      $Appointment.End = $End
+      $Appointment.Location = $Location
+      $Appointment.Body = $Body
+      $Appointment.ReminderSet = $ReminderSet
+      $Appointment.ReminderMinutesBeforeStart = $ReminderMinutesBeforeStart
+      $Appointment.BusyStatus = if ($BusyStatusBusy) { 2 } else { 0 }  # 2 = Busy, 0 = Free
+      $Appointment.AllDayEvent = [System.Convert]::ToBoolean($AllDayEvent)
+      # Save the appointment
+      $Appointment.Save()
+      Write-Host "Appointment created: $Subject at $Start"
+  }
+  catch {
+      Write-Error "Failed to create appointment: $_"
+  }
+#+end_src
+
+Below an example how to use the script.
+
+#+begin_src powershell
+  ~/.emacs.d/scripts/CreateAppointment.ps1 `
+  -Subject "Weekly Sync" `
+  -Start (Get-Date).AddHours(1) `
+  -End (Get-Date).AddHours(2) `
+  -Location "Teams" `
+  -Body "Discuss weekly updates" `
+  -ReminderSet $true `
+  -ReminderMinutesBeforeStart 10 `
+  -BusyStatusBusy $true `
+  -AllDayEvent $true
+#+end_src
+
+
+I can call these scripts from Emacs using the Elisp code below. The function
+~my/org-outlook-export-scheduled-event-at-point~ is an interactive function
+that you can use to create a calendar event in Outlook from any Org-mode
+headline that contains a ~SCHEDULED~ timestamp property.
+
+
+#+begin_src elisp :tangle "~/.emacs.d/elisp/my-org-outlook.el"
+  ;;; my-org-outlook.el --- -*- lexical-binding: t; -*-
+  ;;; Commentary:
+  ;;  Small utilities to interface org-mode with outlook using org-element and powershell scripts
+  ;;
+
+  ;;; Code:
+
+  (require 'org-element)
+
+  (defun my/org-outlook--format-time (dt)
+    "Format decoded time DT into a string."
+    (format-time-string "%FT%T" (encode-time dt)))
+
+  (defun my/org-outlook--make-appointment (subject start end &optional alldayevent location body)
+    "Create a plist representing an Outlook appointment.
+
+  SUBJECT is the title. START and END are date-time strings in the format \"YYYY-MM-DDTHH:MM:SS\".
+
+  Optional:
+  - ALLDAYEVENT non-nil marks it as an all-day event.
+  - LOCATION and BODY are optional strings (default to empty).
+
+  The result can be used to create or export calendar events."
+    (list :subject subject
+          :start start
+          :end end
+          :location (or location "")
+          :body (or body "")
+          :alldayevent (or alldayevent nil)))
+
+  (defun my/org-outlook--format-timestamp (ts &optional end)
+    "Format TS start to string. If END not nil, format TS end instead."
+    (let ((year (org-element-property (if end :year-end :year-start) ts))
+          (month (org-element-property (if end :month-start :month-start) ts))
+          (day (org-element-property (if end :day-end :day-start) ts))
+          (hour (org-element-property (if end :hour-end  :hour-start) ts))
+          (minute (org-element-property (if end :minute-end :minute-start) ts)))
+      (my/org-outlook--format-time (make-decoded-time :year year :month month :day day :hour (or hour 0) :minute (or minute 0) :second 0))))
+
+  (defun my/org-outlook--create-appointment (element)
+    "Create an appointment from ELEMENT's `:scheduled' property."
+    (when-let*
+        ((scheduled (org-element-property :scheduled element)))
+      (let*
+          ((subject (org-element-property :title element))
+           (location (org-element-property :location element))
+           (start (my/org-outlook--format-timestamp scheduled))
+           (end (my/org-outlook--format-timestamp scheduled t))
+           ;; make the appointment an all-day event if hour-start is nil
+           (alldayevent (not (org-element-property :hour-start scheduled))))
+        (my/org-outlook--make-appointment subject start end alldayevent location))))
+
+  (defun my/org-outlook-create-appointment (appointment)
+    "Create APPOINTMENT in outlook calendar by calling a PowerShell script."
+    (let* ((ps-script (expand-file-name "./scripts/CreateAppointment.ps1" user-emacs-directory))
+           (cmd (format "powershell.exe -ExecutionPolicy Bypass -File \"%s\" -Subject \"%s\" -Start \"%s\" -End \"%s\" -Location \"%s\" -Body \"%s\" -AllDayEvent %s"
+                        ps-script
+                        (plist-get appointment :subject)
+                        (plist-get appointment :start)
+                        (plist-get appointment :end)
+                        (plist-get appointment :location)
+                        (plist-get appointment :body)
+                        (if (plist-get appointment :alldayevent)
+                            "true"
+                          "false"))))
+      (shell-command cmd "*Outlook Appointment Output*")))
+
+  (defun my/org-outlook-export-scheduled-event-at-point ()
+    "Export scheduled event at point to outlook calendar."
+    (interactive)
+    (save-excursion
+      (org-back-to-heading t)
+      (when-let*
+          ((element (org-element-at-point))
+           (appointment (my/org-outlook--create-appointment element)))
+        (my/org-outlook-create-appointment appointment))))
+
+  (provide 'my-org-outlook)
+  ;;; my-org-outlook.el ends here
+#+end_src
+
+
+* Mail integration
+
+Not done yet...
+
+Create an email.
+#+begin_src powershell
+  param (
+      [string]$to,
+      [string]$subject,
+      [string]$htmlBody
+  )
+
+  $outlook = New-Object -ComObject Outlook.Application
+  $mail = $outlook.CreateItem(0)
+
+  $mail.To = $to
+  $mail.Subject = $subject
+  $mail.BodyFormat = 2  # olFormatHTML
+  $mail.HTMLBody = $htmlBody
+
+  $mail.Display() # or Send()
+#+end_src
+
+Create an email with some text formatting.
+#+begin_src powershell
+  $outlook = New-Object -ComObject Outlook.Application
+  $mail = $outlook.CreateItem(0)  # 0 = MailItem
+
+  $mail.To = "recipient@example.com"
+  $mail.Subject = "Hello from Emacs"
+  $mail.Body = "<b>This email</b> was sent from Emacs via PowerShell."
+  # Optional: $mail.Attachments.Add("C:\\Path\\To\\File.txt")
+
+  # $mail.Send()  # Or use .Display() if you want to preview
+  $mail.Display()
+#+end_src
+
+
+Create an email with some text formatting using css.
+#+begin_src powershell
+  $outlook = New-Object -ComObject Outlook.Application
+  $mail = $outlook.CreateItem(0)  # 0 = olMailItem
+
+  $mail.Display()
+
+  $mail.To = "recipient@example.com"
+  $mail.Subject = "Formatted Email from Emacs"
+  # $mail.BodyFormat = 2  # 2 = olFormatHTML
+
+  $mail.HTMLBody = @"
+  <html>
+    <body>
+    <head>
+    <style>
+    body { font-family: Calibri; font-size: 11pt; color: #1F497D; }
+    h1 { font-size: 18pt; color: #4F81BD; }
+    </style>
+    </head>
+    <h1>TEST</h1>
+      <p><b>Hello!</b></p>
+      <p>This email was sent <i>from Emacs</i> via PowerShell.</p>
+      <p>Here is a list:</p>
+      <ul>
+        <li><b>Item 1</b></li>
+        <li><i>Item 2</i></li>
+      </ul>
+      <p>Regards,<br><b>Your Script</b></p>
+    </body>
+  </html>
+  "@ + $mail.HTMLBody
+
+  $mail.Display()
+#+end_src
