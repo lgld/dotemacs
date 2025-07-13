@@ -15,11 +15,11 @@ configuration compatible with both environment.
 
 * How to use
 
-Open [[file:dotemacs.org][dotemacs.org]] with Emacs and tangle code using 'C-c C-v t' to initialize
+Open [[file:./dotemacs.org][dotemacs.org]] with Emacs and tangle code using 'C-c C-v t' to initialize
 =~/.emacs.d/early-init.el= and =~/.emacs.d/init.el=. If these files already
 exists, they will be overwritten.
 
-Open [[file:my-org-outlook.org][my-org-outlook.org]] with Emacs and tangle code to initialize utilities to interface Org-mode
+Open [[file:./my-org-outlook.org][my-org-outlook.org]] with Emacs and tangle code to initialize utilities to interface Org-mode
 with Outlook using ~org-element~ and PowerShell scripts.
 
 
