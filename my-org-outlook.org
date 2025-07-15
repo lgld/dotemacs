@@ -8,11 +8,7 @@ Small utilities to interface Org-mode with Outlook using ~org-element~ and Power
 To initialize the scripts:
 
 1. Open this file in Emacs.
-2. Run the following command to tangle the code:
-
-   #+BEGIN_SRC elisp
-   C-c C-v t
-   #+END_SRC
+2. Run the following command to tangle the code =C-c C-v t=
 
 This will generate:
 
@@ -60,9 +56,10 @@ This powershell script create an appointment in calendar using outlook com objec
       $Appointment.ReminderMinutesBeforeStart = $ReminderMinutesBeforeStart
       $Appointment.BusyStatus = if ($BusyStatusBusy) { 2 } else { 0 }  # 2 = Busy, 0 = Free
       $Appointment.AllDayEvent = [System.Convert]::ToBoolean($AllDayEvent)
+
       # Save the appointment
       $Appointment.Save()
-      Write-Host "Appointment created: $Subject at $Start"
+      Write-Host "Appointment created: $Subject at $Start -> $End"
   }
   catch {
       Write-Error "Failed to create appointment: $_"
@@ -129,7 +126,10 @@ headline that contains a ~SCHEDULED~ timestamp property.
           (day (org-element-property (if end :day-end :day-start) ts))
           (hour (org-element-property (if end :hour-end  :hour-start) ts))
           (minute (org-element-property (if end :minute-end :minute-start) ts)))
-      (my/org-outlook--format-time (make-decoded-time :year year :month month :day day :hour (or hour 0) :minute (or minute 0) :second 0))))
+      ;; If hour and minute are 0 and the appointment is marked as AllDayEvent.
+      ;; The appointment is displayed like an event scheduled at 00:00 in the
+      ;; outlook calendar. Set minute to 1 by default to display the event correctly.
+      (my/org-outlook--format-time (make-decoded-time :year year :month month :day day :hour (or hour 0) :minute (or minute 1) :second 0))))
 
   (defun my/org-outlook--create-appointment (element)
     "Create an appointment from ELEMENT's `:scheduled' property."
@@ -149,11 +149,14 @@ headline that contains a ~SCHEDULED~ timestamp property.
     (let* ((ps-script (expand-file-name "./scripts/CreateAppointment.ps1" user-emacs-directory))
            (cmd (format "powershell.exe -ExecutionPolicy Bypass -File \"%s\" -Subject \"%s\" -Start \"%s\" -End \"%s\" -Location \"%s\" -Body \"%s\" -AllDayEvent %s"
                         ps-script
-                        (plist-get appointment :subject)
+                        ;; Convert the subject, location, and object strings to
+                        ;; Windows-1252 encoding to ensure accented characters are
+                        ;; displayed correctly.
+                        (encode-coding-string (plist-get appointment :subject) 'latin-1)
                         (plist-get appointment :start)
                         (plist-get appointment :end)
-                        (plist-get appointment :location)
-                        (plist-get appointment :body)
+                        (encode-coding-string (plist-get appointment :location) 'latin-1)
+                        (encode-coding-string (plist-get appointment :body) 'latin-1)
                         (if (plist-get appointment :alldayevent)
                             "true"
                           "false"))))
