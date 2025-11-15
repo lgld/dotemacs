@@ -26,6 +26,9 @@ Open [[file:org-setup-files.org][org-setup-files.org]] with Emacs and tangle cod
 in =~/.emacs.d/setup/= directory. This files are used to do basic styling when
 exporting to pdf or html.
 
+Open [[file:org-setup-files.org][my-emacs-skeleton.org]] with Emacs and tangle code to initialize an Elisp module
+in the =~/.emacs.d/elisp/= directory that defines skeletons for various file templates.
+
 * Personal settings
 
 Personal settings can be load from =.work/settings.el= or =.home/settings.el= if
@@ -45,7 +48,10 @@ variable to a different path.
   - [ ] Create an org-mode SCHEDULED item from outlook appointment (org-protocol ?)
 - [ ] Macosx integration
   - [ ] Create event in calendar app from org-mode SCHEDULED item
-- [ ] Add org-mode template for project management
+- [1/2] Add org-mode template for project management
+  - [X] Create basic project template using skeleton.el
+  - [ ] Improve current skeleton
 - [X] Add template for org-mode html export
 - [X] Add template for org-mode pdf export
 - [ ] Add template for org-mode docx export (is it possible ?)
+- [ ] Add something in this README to automatically tangle all org files at once

@@ -88,6 +88,7 @@ Load my personal lisp module stored in "elisp" directory
                (expand-file-name "elisp" user-emacs-directory))
   (load "lg-lisp")
   (load "my-org-outlook")
+  (load "my-emacs-skeleton")
 #+end_src
 
 ** Default settings

@@ -1,0 +1,84 @@
+# -*- ispell-local-dictionary: "en_US" -*-
+#+TITLE: Emacs skeleton
+#+AUTHOR: L. Gualdi
+#+LANGUAGE: en
+#+PROPERTY: header-args :tangle "~/.emacs.d/elisp/my-emacs-skeleton.el" :exports code :mkdirp yes
+
+#+begin_src elisp
+  ;;; my-emacs-skeleton.el --- -*- lexical-binding: t; -*-
+  ;;; Commentary:
+  ;;  Various skeleton definition to generate simple file template
+  ;;
+
+  ;;; Code:
+
+  (require 'skeleton)
+#+end_src
+
+
+
+* Org-mode file skeleton
+
+
+#+begin_src elisp
+  (define-skeleton my/org-project-skeleton
+    "Generate an org-mode file skeleton for project management"
+    nil
+    "# -*- ispell-local-dictionary: \"en_US\" -*-" \n
+    "#+TITLE: A Project" \n
+    "#+SUBTITLE: A Super Project" \n
+    "#+AUTHOR: The Author" \n
+    "#+LANGUAGE: en" \n
+    "#+OPTIONS: ^:nil toc:nil num:nil" \n
+    "#+SETUPFILE: ~/.emacs.d/setup/latex_headers_basic.setup" \n
+    "#+SETUPFILE: ~/.emacs.d/setup/html_headers_basic.setup" \n
+    "#+COLUMNS: %ITEM(Task) %TODO(State) %Effort(Estimate){:} %SCHEDULED %CLOSED %CLOCKSUM(Clocked) %CLOCKSUM_T(Today)" \n
+
+    "* Project estimate" \n \n
+
+    "#+BEGIN: columnview :match \"-option\"  :format \"%ITEM(*Task*) %Effort(*Estimate*)\" :hlines 3 :id \"ProjectID\" :indent t"
+    \n
+    \n
+    \n
+    "#+TBLFM: @2$2='(format \"Total : %.02f days\" (+ @II..@>));N" \n
+    "#+END:"
+    \n
+    \n
+    "** A Brand New Project" \n
+    ":PROPERTIES:" \n
+    ":ID:       ProjectID" \n
+    ":END:" \n
+    "*** Part 1" \n
+    "**** Sub part 1" \n
+    "***** Something 1" \n
+    "***** Something 2" \n
+    "***** Something 3" \n
+    "**** Sub Part 2" \n
+    ":PROPERTIES:" \n
+    ":Effort:   1d" \n
+    ":END:" \n
+    "*** Part 2" \n
+    "**** Programming something" \n
+    ":PROPERTIES:" \n
+    ":Effort:   2.5d" \n
+    ":END:" \n
+    "**** Doing stuff" \n
+    ":PROPERTIES:" \n
+    ":Effort:   0.5d" \n
+    ":END:" \n
+    "**** Doing other stuff" \n
+    "***** Sub part" \n
+    ":PROPERTIES:" \n
+    ":Effort:   1d" \n
+    ":END:" \n
+    "*** Another Part" \n
+    ":PROPERTIES:" \n
+    ":Effort:   1d" \n
+    ":END:" \n)
+#+end_src
+
+* <EOF>
+#+begin_src elisp
+  (provide 'my-emacs-skeleton)
+  ;;; my-emacs-skeleton ends here
+#+end_src
