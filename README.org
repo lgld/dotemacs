@@ -22,6 +22,9 @@ exists, they will be overwritten.
 Open [[file:./my-org-outlook.org][my-org-outlook.org]] with Emacs and tangle code to initialize utilities to interface Org-mode
 with Outlook using ~org-element~ and PowerShell scripts.
 
+Open [[file:org-setup-files.org][org-setup-files.org]] with Emacs and tangle code to initialize *.setup files
+in =~/.emacs.d/setup/= directory. This files are used to do basic styling when
+exporting to pdf or html.
 
 * Personal settings
 
@@ -43,6 +46,6 @@ variable to a different path.
 - [ ] Macosx integration
   - [ ] Create event in calendar app from org-mode SCHEDULED item
 - [ ] Add org-mode template for project management
-- [ ] Add template for org-mode html export
-- [ ] Add template for org-mode pdf export
+- [X] Add template for org-mode html export
+- [X] Add template for org-mode pdf export
 - [ ] Add template for org-mode docx export (is it possible ?)

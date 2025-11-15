@@ -1,0 +1,95 @@
+# -*- ispell-local-dictionary: "en_US" -*-
+#+TITLE: Org-mode setup files
+#+AUTHOR: L. Gualdi
+#+LANGUAGE: en
+#+PROPERTY: header-args :tangle no :exports code :mkdirp yes
+
+This setup files can be used in an org files to specify additional in-buffer settings.
+You can use it by inserting =#+SETUPFILE: filename= in the org document.
+
+I use this setup file to do basic styling when exporting an org document to pdf via LaTeX or to html.
+
+* Basic LaTeX export
+
+#+begin_src org :tangle "~/.emacs.d/setup/latex_export_basic.setup"
+  ; -*-org-*-
+  ,#+LATEX_CLASS: article
+  ,#+LATEX_COMPILER: xelatex
+  ,#+LATEX_CLASS_OPTIONS: [a4paper,10pt]
+
+  ,#+latex_header: \usepackage[paper=a4paper]{geometry}
+  ,#+latex_header:
+  ,#+latex_header: % Page geometry
+  ,#+latex_header: \geometry{
+  ,#+latex_header:   left=25mm,
+  ,#+latex_header:   right=25mm,
+  ,#+latex_header:   top=28mm,
+  ,#+latex_header:   bottom=25mm,
+  ,#+latex_header:   headheight=14mm   % <-- important: increase if header content is tall
+  ,#+latex_header: }
+  ,#+latex_header:
+
+  ,#+latex_header: \usepackage{graphicx}
+  ,#+latex_header: \usepackage{longtable}
+  ,#+latex_header: \usepackage{wrapfig}
+  ,#+latex_header: \usepackage{rotating}
+  ,#+latex_header: \usepackage[normalem]{ulem}
+  ,#+latex_header: \usepackage{amsmath}
+  ,#+latex_header: \usepackage{amssymb}
+  ,#+latex_header: \usepackage{capt-of}
+  ,#+latex_header: \usepackage{hyperref}
+  ,#+latex_header: \usepackage{sectsty}
+
+  ,#+latex_header: \usepackage[x11names]{xcolor}
+  ,#+latex_header: \sectionfont{\color{SteelBlue4}}  % sets colour of sections
+  ,#+latex_header: \subsectionfont{\color{SteelBlue4}}  % sets colour of subsections
+  ,#+latex_header: \subsubsectionfont{\color{SteelBlue4}}  % optional
+
+  ,#+latex_header: \usepackage[sfdefault,light]{roboto}
+  ,#+latex_header: \usepackage{polyglossia} \setmainlanguage{french}
+  ,#+latex_header: \hypersetup{colorlinks=true,linkcolor=black}
+
+  # #+latex_header: \usepackage{authoraftertitle}
+  ,#+latex_header: \usepackage{lastpage} % <-- Package to get the last page
+
+
+  ,#+latex_header: \usepackage{titlesec}
+  ,#+latex_header:
+  ,#+latex_header: \titleformat{\section}
+  ,#+latex_header:   {\normalfont\large\bfseries\color{SteelBlue4}}   % Format of the section title
+  ,#+latex_header:   {\thesection}{1em}{}           % Label and spacing
+  ,#+latex_header:   [\titlerule]                   % <-- Adds a horizontal rule after the title
+
+
+  ,#+latex_header: \titleformat{\subsection}
+  ,#+latex_header:   {\normalfont\large\bfseries\color{SteelBlue4}}
+  ,#+latex_header:   {\thesubsection}{1em}{}
+
+  ,#+latex_header: \titleformat{\subsubsection}
+  ,#+latex_header:   {\normalfont\large\color{SteelBlue4}}
+  ,#+latex_header:   {\thesubsubsection}{1em}{}
+
+  ,#+latex_header: \usepackage{graphicx}
+  ,#+latex_header: \usepackage[most]{tcolorbox}
+
+
+  ,#+latex_header: % Fancyhdr setup
+  ,#+latex_header: \usepackage{fancyhdr}
+  ,#+latex_header: \pagestyle{fancy}
+  ,#+latex_header: \fancyhf{} % clear all header/footer fields
+
+  ,#+latex_header: \fancypagestyle{plain}{%
+  ,#+latex_header: \renewcommand{\headrulewidth}{0pt}%
+  ,#+latex_header: \fancyhf{}%
+  ,#+latex_header: \fancyfoot[C]{\thepage/\pageref{LastPage}}}
+
+#+end_src
+
+* Basic HTML export
+
+#+begin_src org :tangle "~/.emacs.d/setup/html_export_basic.setup"
+  ; -*-org-*-
+  ,#+HTML_HEAD: <style type="text/css">
+  ,#+HTML_HEAD: @import url(https://fonts.googleapis.com/css?family=Inconsolata|Inter&display=swap);table{margin-left: auto;margin-right: auto;}body{margin:40px auto;max-width:900px;line-height:1.6;font-size:16px;color:#444;padding:0 10px;font-family:Inter,sans-serif}h2{}h3{border-bottom: 1px solid #444}h1,h2,h3{line-height:1.2;font-family:Inter,sans-serif}img{max-width:750px;width: 75%;border-radius:10px}pre{font-family:Inconsolata,monospace}::selection{color:#fff;background:#ff4081}blockquote{margin-top: 10px;margin-bottom: 10px;margin-left: 50px;padding-left: 15px;border-left: 3px solid #d52e2e;}
+  ,#+HTML_HEAD: </style>
+#+end_src
