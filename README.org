@@ -26,7 +26,7 @@ Open [[file:org-setup-files.org][org-setup-files.org]] with Emacs and tangle cod
 in =~/.emacs.d/setup/= directory. This files are used to do basic styling when
 exporting to pdf or html.
 
-Open [[file:org-setup-files.org][my-emacs-skeleton.org]] with Emacs and tangle code to initialize an Elisp module
+Open [[file:my-emacs-skeleton.org][my-emacs-skeleton.org]] with Emacs and tangle code to initialize an Elisp module
 in the =~/.emacs.d/elisp/= directory that defines skeletons for various file templates.
 
 * Personal settings
