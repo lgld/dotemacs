@@ -575,13 +575,6 @@ org-mode source block.
     (set-face-attribute 'org-block nil :foreground 'unspecified :inherit 'fixed-pitch)
     (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 
-    (setq org-capture-templates
-          (quote (
-                  ("t" "Todo" entry (file+headline "Todo.org" "Tâches")
-                   "* TODO %?%^{CATEGORY}p\n%U\n" :empty-lines 1 :jump-to-captured t)
-                  ("a" "Appeler un client" entry (file+headline "Todo.org" "Tâches")
-                   "* Appeler %^{Nom client}\nSCHEDULED:%^t\n%?" :empty-lines 1 :jump-to-captured t))))
-
     (setq org-M-RET-may-split-line '((default . nil))) ; Doing M-RET when cursor is in middle of heading will not split line at current POS
 
     (setq org-todo-keywords
@@ -660,13 +653,7 @@ I do not used org-roam yet.
     :after (org)
     :ensure t
     :config
-    (org-super-agenda-mode)
-    (setq org-super-agenda-groups '(
-                                    (:name "Prestation" :order 2 :and (:todo "TODO" :tag "prestation"))
-                                    (:name "Technique" :order 5 :and (:todo ("TODO" "WAITING" "MAYBE") :tag ("tech" "dev")))
-                                    (:name "A Faire" :todo "TODO" :order 1 )
-                                    (:name "En Attente" :todo "WAITING" :order 4 )
-                                    (:name "Un jour peut-être" :todo "MAYBE" :order 500 ))))
+    (org-super-agenda-mode))
 #+end_src
 
 *** Terminal and shell
