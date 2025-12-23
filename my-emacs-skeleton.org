@@ -19,6 +19,7 @@
 
 * Org-mode file skeleton
 
+** English
 
 #+begin_src elisp
   (define-skeleton my/org-project-skeleton
@@ -76,6 +77,68 @@
     ":Effort:   1d" \n
     ":END:" \n)
 #+end_src
+
+
+
+** French
+
+#+begin_src elisp
+  (define-skeleton my/org-project-fr-skeleton
+    "Generate an org-mode file skeleton for project management (french)"
+    nil
+    "# -*- ispell-local-dictionary: \"fr\" -*-" \n
+    "#+TITLE: Mon Projet" \n
+    "#+SUBTITLE: Un super projet" \n
+    "#+AUTHOR: L'auteur" \n
+    "#+LANGUAGE: fr" \n
+    "#+OPTIONS: ^:nil toc:nil num:nil" \n
+    "#+SETUPFILE: ~/.emacs.d/setup/latex_headers_basic.setup" \n
+    "#+SETUPFILE: ~/.emacs.d/setup/html_headers_basic.setup" \n
+    "#+COLUMNS: %ITEM(Task) %TODO(State) %Effort(Estimate){:} %SCHEDULED %CLOSED %CLOCKSUM(Clocked) %CLOCKSUM_T(Today)" \n
+
+    "* Estimation du projet" \n \n
+
+    "#+BEGIN: columnview :match \"-option\"  :format \"%ITEM(*Tâche*) %Effort(*Estimation*)\" :hlines 3 :id \"ProjectID\" :indent t"
+    \n
+    \n
+    \n
+    "#+TBLFM: @2$2='(format \"Total : %.02f jours\" (+ @II..@>));N" \n
+    "#+END:"
+    \n
+    \n
+    "** Un nouveau projet" \n
+    ":PROPERTIES:" \n
+    ":ID:       ProjectID" \n
+    ":END:" \n
+    "*** Partie 1" \n
+    "**** Sous partie 1" \n
+    "***** Quelque chose 1" \n
+    "***** Quelque chose 2" \n
+    "***** Quelque chose 3" \n
+    "**** Sous partie 2" \n
+    ":PROPERTIES:" \n
+    ":Effort:   1d" \n
+    ":END:" \n
+    "*** Partie 2" \n
+    "**** Programmation" \n
+    ":PROPERTIES:" \n
+    ":Effort:   2.5d" \n
+    ":END:" \n
+    "**** Faire ceci" \n
+    ":PROPERTIES:" \n
+    ":Effort:   0.5d" \n
+    ":END:" \n
+    "**** Faire autre chose" \n
+    "***** Sous partie" \n
+    ":PROPERTIES:" \n
+    ":Effort:   1d" \n
+    ":END:" \n
+    "*** Une autre partie" \n
+    ":PROPERTIES:" \n
+    ":Effort:   1d" \n
+    ":END:" \n)
+#+end_src
+
 
 * <EOF>
 #+begin_src elisp
