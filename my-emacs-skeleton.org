@@ -30,14 +30,14 @@
     "#+SUBTITLE: A Super Project" \n
     "#+AUTHOR: The Author" \n
     "#+LANGUAGE: en" \n
-    "#+OPTIONS: ^:nil toc:nil num:nil" \n
+    "#+OPTIONS: ^:nil toc:nil num:nil H:5" \n
     "#+SETUPFILE: ~/.emacs.d/setup/latex_headers_basic.setup" \n
     "#+SETUPFILE: ~/.emacs.d/setup/html_headers_basic.setup" \n
     "#+COLUMNS: %ITEM(Task) %TODO(State) %Effort(Estimate){:} %SCHEDULED %CLOSED %CLOCKSUM(Clocked) %CLOCKSUM_T(Today)" \n
 
     "* Project estimate" \n \n
 
-    "#+BEGIN: columnview :match \"-option\"  :format \"%ITEM(*Task*) %Effort(*Estimate*)\" :hlines 3 :id \"ProjectID\" :indent t"
+    "#+BEGIN: columnview :match \"-option\"  :format \"%ITEM(*Task*) %Effort(*Estimate*)\" :hlines 2 :id \"ProjectID\" :indent t"
     \n
     \n
     \n
@@ -45,34 +45,34 @@
     "#+END:"
     \n
     \n
-    "** A Brand New Project" \n
+    "* A Brand New Project" \n
     ":PROPERTIES:" \n
     ":ID:       ProjectID" \n
     ":END:" \n
-    "*** Part 1" \n
-    "**** Sub part 1" \n
-    "***** Something 1" \n
-    "***** Something 2" \n
-    "***** Something 3" \n
-    "**** Sub Part 2" \n
+    "** Part 1" \n
+    "*** Sub part 1" \n
+    "**** Something 1" \n
+    "**** Something 2" \n
+    "**** Something 3" \n
+    "*** Sub Part 2" \n
     ":PROPERTIES:" \n
     ":Effort:   1d" \n
     ":END:" \n
-    "*** Part 2" \n
-    "**** Programming something" \n
+    "** Part 2" \n
+    "*** Programming something" \n
     ":PROPERTIES:" \n
     ":Effort:   2.5d" \n
     ":END:" \n
-    "**** Doing stuff" \n
+    "*** Doing stuff" \n
     ":PROPERTIES:" \n
     ":Effort:   0.5d" \n
     ":END:" \n
-    "**** Doing other stuff" \n
-    "***** Sub part" \n
+    "*** Doing other stuff" \n
+    "**** Sub part" \n
     ":PROPERTIES:" \n
     ":Effort:   1d" \n
     ":END:" \n
-    "*** Another Part" \n
+    "** Another Part" \n
     ":PROPERTIES:" \n
     ":Effort:   1d" \n
     ":END:" \n)
@@ -91,14 +91,14 @@
     "#+SUBTITLE: Un super projet" \n
     "#+AUTHOR: L'auteur" \n
     "#+LANGUAGE: fr" \n
-    "#+OPTIONS: ^:nil toc:nil num:nil" \n
+    "#+OPTIONS: ^:nil toc:nil num:t H:5" \n
     "#+SETUPFILE: ~/.emacs.d/setup/latex_headers_basic.setup" \n
     "#+SETUPFILE: ~/.emacs.d/setup/html_headers_basic.setup" \n
     "#+COLUMNS: %ITEM(Task) %TODO(State) %Effort(Estimate){:} %SCHEDULED %CLOSED %CLOCKSUM(Clocked) %CLOCKSUM_T(Today)" \n
 
     "* Estimation du projet" \n \n
 
-    "#+BEGIN: columnview :match \"-option\"  :format \"%ITEM(*Tâche*) %Effort(*Estimation*)\" :hlines 3 :id \"ProjectID\" :indent t"
+    "#+BEGIN: columnview :match \"-option\"  :format \"%ITEM(*Tâches*) %Effort(*Estimation*)\" :hlines 2 :id \"ProjectID\" :indent t"
     \n
     \n
     \n
@@ -106,34 +106,34 @@
     "#+END:"
     \n
     \n
-    "** Un nouveau projet" \n
+    "* Un nouveau projet" \n
     ":PROPERTIES:" \n
     ":ID:       ProjectID" \n
     ":END:" \n
-    "*** Partie 1" \n
-    "**** Sous partie 1" \n
-    "***** Quelque chose 1" \n
-    "***** Quelque chose 2" \n
-    "***** Quelque chose 3" \n
-    "**** Sous partie 2" \n
+    "** Partie 1" \n
+    "*** Sous partie 1" \n
+    "**** Quelque chose 1" \n
+    "**** Quelque chose 2" \n
+    "**** Quelque chose 3" \n
+    "*** Sous partie 2" \n
     ":PROPERTIES:" \n
     ":Effort:   1d" \n
     ":END:" \n
-    "*** Partie 2" \n
-    "**** Programmation" \n
+    "** Partie 2" \n
+    "*** Programmation" \n
     ":PROPERTIES:" \n
     ":Effort:   2.5d" \n
     ":END:" \n
-    "**** Faire ceci" \n
+    "*** Faire ceci" \n
     ":PROPERTIES:" \n
     ":Effort:   0.5d" \n
     ":END:" \n
-    "**** Faire autre chose" \n
-    "***** Sous partie" \n
+    "*** Faire autre chose" \n
+    "**** Sous partie" \n
     ":PROPERTIES:" \n
     ":Effort:   1d" \n
     ":END:" \n
-    "*** Une autre partie" \n
+    "** Une autre partie" \n
     ":PROPERTIES:" \n
     ":Effort:   1d" \n
     ":END:" \n)
