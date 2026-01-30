@@ -34,6 +34,9 @@
               (setq gc-cons-threshold minimal-emacs-gc-cons-threshold)))
 
   ;;; Performance
+  ;; Set environment variable to speed up lsp-mode
+  ;; check https://emacs-lsp.github.io/lsp-mode/page/performance/
+  (setenv "LSP_USE_PLISTS" "true")
 
   ;; Prefer loading newer compiled files
   (setq load-prefer-newer t)
@@ -266,6 +269,7 @@ Use function from [[https://jeffkreeftmeijer.com/emacs-configuration/][Jeff Kree
   ;; Use a hook to use variable pitch font in text-mode
   (add-hook 'text-mode-hook #'variable-pitch-mode)
 #+end_src
+
 
 ** Packages settings
 Package repository declaration and package initialization is done in =early-init.el=.
@@ -524,10 +528,21 @@ Grammalect command line and server needs =Python 3.5+= our =Python 3.7+= to run.
 #+end_src
 
 *** Corfu
+
+I used some code from [[https://kristofferbalintona.me/posts/202202270056/][Kristoffer Balintona]] blog to enable corfu instead of company.
+
 #+begin_src elisp
+  ;; Setup lsp to use corfu for lsp completion
+  (defun kb/corfu-setup-lsp ()
+    "Use orderless completion style with lsp-capf instead of the
+    default lsp-passthrough."
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
+
   (use-package corfu
     :ensure t
     ;; Optional customizations
+    ;; :hook (lsp-completion-mode . kb/corfu-setup-lsp) ; Use corfu for lsp completion
     :custom
     (corfu-auto t) ;; Enable corfu autocompletion
     ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -602,8 +617,7 @@ Completion at point extensions to be used in combination with =corfu=.
 #+begin_src elisp
   (use-package dired
     :ensure nil
-    ;; :hook
-    ;; (dired-mode . dired-hide-details-mode)
+
     :custom
     (dired-dwim-target t))
 #+end_src
@@ -715,6 +729,15 @@ I do not used org-roam yet.
     (org-super-agenda-mode))
 #+end_src
 
+*** Which-key
+Display available keybindings.
+#+begin_src elisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+#+end_src
+
 *** Terminal and shell
 Use =eat= terminal emulator when running macosx.
 #+begin_src elisp
@@ -726,6 +749,299 @@ Use =eat= terminal emulator when running macosx.
     ;; (eshell-load . eat-eshell-visual-command-mode)
     )
 #+end_src
+
+*** Code editing
+For this part, i found various info on different blogs :
+- Ovi Stoica's blog [[https://www.ovistoica.com/blog/2024-7-05-modern-emacs-typescript-web-tsx-config][modern emacs typescript web config]]
+-
+
+**** Tree-sitter
+
+[[https://tree-sitter.github.io]]
+
+Tree-sitter is builtin starting Emacs 29.
+
+To use tree-sitter on windows, you need a C compiler to compile language's
+grammar. You can install =gcc= with MSYS2 and modify your PATH accordingly.
+
+You can check if the compiler is found directly in emacs by executing this command :
+#+begin_src elisp :tangle no
+  M-: (executable-find "gcc")
+#+end_src
+
+#+RESULTS:
+: c:/msys64/mingw64/bin/gcc.exe
+
+To install a grammar. You must call :
+#+begin_src elisp :tangle no
+  M-x treesit-install-language-grammar
+#+end_src
+
+You can then type the language (ex: typescript). If there is no recipe to
+compile the grammar directly, emacs will prompt you all the questions to
+download and compile the grammar.
+
+The following config was taken from
+
+#+begin_src elisp
+  (use-package treesit
+    :mode (("\\.tsx\\'" . tsx-ts-mode)
+           ("\\.js\\'"  . typescript-ts-mode)
+           ("\\.mjs\\'" . typescript-ts-mode)
+           ("\\.mts\\'" . typescript-ts-mode)
+           ("\\.cjs\\'" . typescript-ts-mode)
+           ("\\.ts\\'"  . typescript-ts-mode)
+           ("\\.jsx\\'" . tsx-ts-mode)
+           ("\\.json\\'" . json-ts-mode)
+           ;; More modes defined here...
+           )
+    :preface
+    (defun os/setup-install-grammars ()
+      "Install Tree-sitter grammars if they are absent."
+      (interactive)
+      (dolist (grammar
+               '((css . ("https://github.com/tree-sitter/tree-sitter-css" "v0.23.2"))
+                 (html . ("https://github.com/tree-sitter/tree-sitter-html" "v0.23.2"))
+                 (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.23.1" "src"))
+                 (json . ("https://github.com/tree-sitter/tree-sitter-json" "v0.24.8"))
+                 (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.23.1" "tsx/src"))
+                 (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.23.1" "typescript/src"))
+                 ))
+
+        (add-to-list 'treesit-language-source-alist grammar)
+        ;; Only install `grammar' if we don't already have it
+        ;; installed. However, if you want to *update* a grammar then
+        ;; this obviously prevents that from happening.
+        (unless (treesit-language-available-p (car grammar))
+          (treesit-install-language-grammar (car grammar)))))
+
+    ;; Optional, but recommended. Tree-sitter enabled major modes are
+    ;; distinct from their ordinary counterparts.
+    ;;
+    ;; You can remap major modes with `major-mode-remap-alist'. Note
+    ;; that this does *not* extend to hooks! Make sure you migrate them
+    ;; also
+    (dolist (mapping
+             '((css-mode . css-ts-mode)
+               (typescript-mode . typescript-ts-mode)
+               (js-mode . typescript-ts-mode)
+               (js2-mode . typescript-ts-mode)
+               (json-mode . json-ts-mode)
+               (js-json-mode . json-ts-mode)))
+      (add-to-list 'major-mode-remap-alist mapping))
+    :config
+    (os/setup-install-grammars))
+#+end_src
+
+**** Lsp mode
+Enable lsp-mode for code editing.
+
+#+begin_src elisp
+  (use-package lsp-mode
+    :init
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-idle-delay 0.500)
+    :hook (
+           (tsx-ts-mode
+            typescript-ts-mode
+            js-ts-mode
+            ) . lsp)
+    ;; if you want which-key integration
+    (lsp-mode . lsp-enable-which-key-integration)
+    :commands lsp)
+
+  (use-package lsp-ui :commands lsp-ui-mode)
+
+  ;; lsp-mode client for eslint
+  (use-package lsp-eslint
+    :demand t
+    :after lsp-mode)
+
+  ;; The lsp-mode client for tailwindcss
+  (use-package lsp-tailwindcss
+    :after lsp-mode
+    :init (setq lsp-tailwindcss-add-on-mode t)
+    :config
+    (dolist (tw-major-mode
+             '(css-mode
+               css-ts-mode
+               typescript-mode
+               typescript-ts-mode
+               tsx-ts-mode
+               js2-mode
+               js-ts-mode))
+      (add-to-list 'lsp-tailwindcss-major-modes tw-major-mode)))
+#+end_src
+
+**** Company
+
+#+begin_src elisp
+   (use-package company
+     :defer 0.5
+     :delight
+     :custom
+     (company-begin-commands '(self-insert-command))
+     (company-idle-delay .1)
+     (company-minimum-prefix-length 2)
+     (company-show-numbers t)
+     (company-tooltip-align-annotations 't)
+     ;; (global-company-mode t)
+     )
+
+   (setq lsp-prefer-capf t)
+#+end_src
+
+#+RESULTS:
+: t
+
+#+begin_src elisp
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+#+end_src
+
+
+**** Treemacs
+
+#+begin_src elisp
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :init
+    (setq treemacs-python-executable (executable-find "python"))
+    (with-eval-after-load 'winum
+      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+    :config
+    (progn
+      (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
+            treemacs-buffer-name-prefix              " *Treemacs-Buffer-"
+            treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+            treemacs-deferred-git-apply-delay        0.5
+            treemacs-directory-name-transformer      #'identity
+            treemacs-display-in-side-window          t
+            treemacs-eldoc-display                   'simple
+            treemacs-file-event-delay                2000
+            treemacs-file-extension-regex            treemacs-last-period-regex-value
+            treemacs-file-follow-delay               0.2
+            treemacs-file-name-transformer           #'identity
+            treemacs-follow-after-init               t
+            treemacs-expand-after-init               t
+            treemacs-find-workspace-method           'find-for-file-or-pick-first
+            treemacs-git-command-pipe                ""
+            treemacs-goto-tag-strategy               'refetch-index
+            treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+            treemacs-hide-dot-git-directory          t
+            treemacs-hide-dot-jj-directory           t
+            treemacs-indentation                     2
+            treemacs-indentation-string              " "
+            treemacs-is-never-other-window           nil
+            treemacs-max-git-entries                 5000
+            treemacs-missing-project-action          'ask
+            treemacs-move-files-by-mouse-dragging    t
+            treemacs-move-forward-on-expand          nil
+            treemacs-no-png-images                   nil
+            treemacs-no-delete-other-windows         t
+            treemacs-project-follow-cleanup          nil
+            treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+            treemacs-position                        'left
+            treemacs-read-string-input               'from-child-frame
+            treemacs-recenter-distance               0.1
+            treemacs-recenter-after-file-follow      nil
+            treemacs-recenter-after-tag-follow       nil
+            treemacs-recenter-after-project-jump     'always
+            treemacs-recenter-after-project-expand   'on-distance
+            treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+            treemacs-project-follow-into-home        nil
+            treemacs-show-cursor                     nil
+            treemacs-show-hidden-files               t
+            treemacs-silent-filewatch                nil
+            treemacs-silent-refresh                  nil
+            treemacs-sorting                         'alphabetic-asc
+            treemacs-select-when-already-in-treemacs 'move-back
+            treemacs-space-between-root-nodes        t
+            treemacs-tag-follow-cleanup              t
+            treemacs-tag-follow-delay                1.5
+            treemacs-text-scale                      nil
+            treemacs-user-mode-line-format           nil
+            treemacs-user-header-line-format         nil
+            treemacs-wide-toggle-width               70
+            treemacs-width                           35
+            treemacs-width-increment                 1
+            treemacs-width-is-initially-locked       t
+            treemacs-workspace-switch-cleanup        nil)
+
+      ;; The default width and height of the icons is 22 pixels. If you are
+      ;; using a Hi-DPI display, uncomment this to double the icon size.
+      ;;(treemacs-resize-icons 44)
+
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode 'always)
+      (when treemacs-python-executable
+        (treemacs-git-commit-diff-mode t))
+
+      (pcase (cons (not (null (executable-find "git")))
+                   (not (null treemacs-python-executable)))
+        (`(t . t)
+         (treemacs-git-mode 'deferred))
+        (`(t . _)
+         (treemacs-git-mode 'simple)))
+
+      (treemacs-hide-gitignored-files-mode nil))
+    :bind
+    (:map global-map
+          ("M-0"       . treemacs-select-window)
+          ("C-x t 1"   . treemacs-delete-other-windows)
+          ("C-x t t"   . treemacs)
+          ("C-x t d"   . treemacs-select-directory)
+          ("C-x t B"   . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
+
+  ;; (use-package treemacs-evil
+  ;;   :after (treemacs evil)
+  ;;   :ensure t)
+
+  (use-package treemacs-projectile
+    :after (treemacs projectile)
+    :ensure t)
+
+  ;; (use-package treemacs-icons-dired
+  ;;   :hook (dired-mode . treemacs-icons-dired-enable-once)
+  ;;   :ensure t)
+
+  (use-package treemacs-magit
+    :after (treemacs magit)
+    :ensure t)
+
+  ;; (use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  ;;   :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  ;;   :ensure t
+  ;;   :config (treemacs-set-scope-type 'Perspectives))
+
+  ;; (use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  ;;   :after (treemacs)
+  ;;   :ensure t
+  ;;   :config (treemacs-set-scope-type 'Tabs))
+
+  ;; (treemacs-start-on-boot)
+#+end_src
+
+#+RESULTS:
+
+*** Prettier
+
+#+begin_src elisp
+  (use-package prettier-js
+  :ensure t
+  :ensure-system-package (prettier . "npm i -g prettier")
+  :hook ((typescript-ts-mode . prettier-js-mode)
+         (js-ts-mode . prettier-js-mode)
+         (web-mode . prettier-js-mode)
+         (css-mode . prettier-js-mode)
+         (tsx-ts-mode . prettier-js-mode)))
+#+end_src
+
 
 ** EOF
 #+begin_src elisp
