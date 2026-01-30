@@ -131,6 +131,9 @@ Load my personal lisp module stored in "elisp" directory
   (setq-default js-indent-level 2)
   (setq-default css-indent-offset 2)
 
+  ;; Add hook to display line number in prog-mode
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+  (add-hook 'prog-mode-hook 'hl-line-mode)
 
   ;; By default, Emacs "updates" its ui more often than it needs to
   (setq idle-update-delay 1.0)
@@ -235,7 +238,15 @@ directly.
 ** Emacs Appearance
 *** Themes
 #+begin_src elisp
-  (load-theme 'tango-plus t)
+  ;; (load-theme 'tango-plus t)
+  (use-package ef-themes
+    :ensure t
+    :config
+    ;; All customisations here.
+    ;; Finally, load your theme of choice (or a random one with
+    ;; `modus-themes-load-random', `modus-themes-load-random-dark',
+    ;; `modus-themes-load-random-light').
+    (modus-themes-load-theme 'ef-cyprus))
 #+end_src
 
 *** Fonts
@@ -448,12 +459,60 @@ Grammalect command line and server needs =Python 3.5+= our =Python 3.7+= to run.
     :bind ("C-x g" . magit-status))
 #+end_src
 
+*** All-the-icons/Nerd Icons
+
+#+begin_src elisp :tangle no
+  (use-package all-the-icons
+    :if (display-graphic-p))
+#+end_src
+
+#+begin_src elisp
+  (use-package nerd-icons
+    :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+   (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
+#+end_src
+
+#+begin_src elisp
+  (use-package nerd-icons-dired
+    :hook
+    (dired-mode . nerd-icons-dired-mode))
+#+end_src
+
+
+#+begin_src elisp
+  ;; (use-package emojify
+  ;;   :config
+  ;;   (when (member "Segoe UI Emoji" (font-family-list))
+  ;;     (set-fontset-font
+  ;;      t 'symbol (font-spec :family "Segoe UI Emoji") nil 'prepend))
+  ;;   (setq emojify-display-style 'unicode)
+  ;;   (setq emojify-emoji-styles '(unicode))
+  ;;   ;; (bind-key* (kbd "C-c .") #'emojify-insert-emoji)) ; override binding in any mode
+
+
+  ;;   :hook (after-init . global-emojify-mode))
+
+  (use-package emojify
+    :hook (after-init . global-emojify-mode))
+#+end_src
+
 *** Spacious padding
 #+begin_src elisp
   (use-package spacious-padding
     :ensure t
     :init
     (spacious-padding-mode))
+#+end_src
+
+*** doom-modeline
+#+begin_src elisp
+  (use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 #+end_src
 
 *** Vertico
