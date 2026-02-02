@@ -91,6 +91,6 @@ You can use it by inserting =#+SETUPFILE: /path/to/filename= in the org document
 #+begin_src org :tangle "~/.emacs.d/setup/html_headers_basic.setup"
   ; -*-org-*-
   ,#+HTML_HEAD: <style type="text/css">
-  ,#+HTML_HEAD: @import url(https://fonts.googleapis.com/css?family=Inconsolata|Inter&display=swap);table{margin-left: auto;margin-right: auto;}body{margin:40px auto;max-width:900px;line-height:1.6;font-size:16px;color:#444;padding:0 10px;font-family:Inter,sans-serif}h2{}h3{border-bottom: 1px solid #444}h1,h2,h3{line-height:1.2;font-family:Inter,sans-serif}img{max-width:750px;width: 75%;border-radius:10px}pre{font-family:Inconsolata,monospace}::selection{color:#fff;background:#ff4081}blockquote{margin-top: 10px;margin-bottom: 10px;margin-left: 50px;padding-left: 15px;border-left: 3px solid #d52e2e;}
+  ,#+HTML_HEAD: @import url(https://fonts.googleapis.com/css?family=Inconsolata|Inter&display=swap);table{margin-left: auto;margin-right: auto;}body{margin:40px auto;max-width:900px;line-height:1.6;font-size:16px;color:#444;padding:0 10px;font-family:Inter,sans-serif}h2{background: #B6CF36AB;padding: 10px;border-radius: 10px;}h3{border-bottom: 1px solid #444}h1,h2,h3{line-height:1.2;font-family:Inter,sans-serif}img{max-width:750px;width: 75%;border-radius:10px}pre{font-family:Inconsolata,monospace}::selection{color:#fff;background:#ff4081}blockquote{margin-top: 10px;margin-bottom: 10px;margin-left: 50px;padding-left: 15px;border-left: 3px solid #d52e2e;}
   ,#+HTML_HEAD: </style>
 #+end_src
