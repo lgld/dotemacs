@@ -545,6 +545,9 @@ I used some code from [[https://kristofferbalintona.me/posts/202202270056/][Kris
     ;; :hook (lsp-completion-mode . kb/corfu-setup-lsp) ; Use corfu for lsp completion
     :custom
     (corfu-auto t) ;; Enable corfu autocompletion
+     ;; Disable corfu for different prog-mode that use lsp-mode (use company instead)
+    (global-corfu-modes '((not tsx-ts-mode typescript-ts-mode js-ts-mode) t))
+
     ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
     ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
     ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
@@ -849,6 +852,8 @@ Enable lsp-mode for code editing.
             ) . lsp)
     ;; if you want which-key integration
     (lsp-mode . lsp-enable-which-key-integration)
+    :config
+    (setq lsp-completion-provider :capf)
     :commands lsp)
 
   (use-package lsp-ui :commands lsp-ui-mode)
@@ -874,22 +879,55 @@ Enable lsp-mode for code editing.
       (add-to-list 'lsp-tailwindcss-major-modes tw-major-mode)))
 #+end_src
 
+Not used yet.
+#+begin_src elisp :tangle no
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+  "Try to parse bytecode instead of json."
+  (or
+   (when (equal (following-char) ?#)
+     (let ((bytecode (read (current-buffer))))
+       (when (byte-code-function-p bytecode)
+         (funcall bytecode))))
+   (apply old-fn args)))
+(advice-add (if (progn (require 'json)
+                       (fboundp 'json-parse-buffer))
+                'json-parse-buffer
+              'json-read)
+            :around
+            #'lsp-booster--advice-json-parse)
+
+(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+  "Prepend emacs-lsp-booster command to lsp CMD."
+  (let ((orig-result (funcall old-fn cmd test?)))
+    (if (and (not test?)                             ;; for check lsp-server-present?
+             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+             lsp-use-plists
+             (not (functionp 'json-rpc-connection))  ;; native json-rpc
+             (executable-find "emacs-lsp-booster"))
+        (progn
+          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+            (setcar orig-result command-from-exec-path))
+          (message "Using emacs-lsp-booster for %s!" orig-result)
+          (cons "emacs-lsp-booster" orig-result))
+      orig-result)))
+(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+#+end_src
+
+
 **** Company
 
 #+begin_src elisp
-   (use-package company
-     :defer 0.5
-     :delight
-     :custom
-     (company-begin-commands '(self-insert-command))
-     (company-idle-delay .1)
-     (company-minimum-prefix-length 2)
-     (company-show-numbers t)
-     (company-tooltip-align-annotations 't)
-     ;; (global-company-mode t)
-     )
-
-   (setq lsp-prefer-capf t)
+  (use-package company
+    :defer 0.5
+    :delight
+    :custom
+    (company-begin-commands '(self-insert-command))
+    (company-idle-delay .1)
+    (company-minimum-prefix-length 2)
+    (company-show-numbers t)
+    (company-tooltip-align-annotations 't)
+    ;; (global-company-mode t)
+    )
 #+end_src
 
 #+RESULTS:
